@@ -4,16 +4,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 import { Rnd } from 'react-rnd';
 import { Document as PDFDocument, Page as PDFPage, pdfjs } from 'react-pdf';
-useEffect(() => {
-    // This code only runs in the browser.
-    if (process.env.NEXT_PUBLIC_VERCEL === 'true') {
-        // When deployed on Vercel, use the worker copied to public folder
-        pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
-    } else {
-        // Local builds, use the default worker module reference
-        pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
-    }
-}, []);
+
 interface TextBox {
     id: number;
     text: string;
@@ -25,6 +16,10 @@ const A4_WIDTH = 595;
 const A4_HEIGHT = 842;
 
 const Page = () => {
+    useEffect(() => {
+        pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
+    }, []);
+
     const pdfRef = useRef<HTMLDivElement | null>(null);
     const sigCanvasRef = useRef<SignatureCanvas | null>(null);
 
