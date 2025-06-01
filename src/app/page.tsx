@@ -1,21 +1,3 @@
-// 'use client'; import React, { useState } from 'react'; import SignaturePad
-// from './SignaturePad'; import MyDocument from './MyDocument'; import {
-// PDFDownloadLink } from '@react-pdf/renderer'; export default function App() {
-//     const [name, setName] = useState('');     const [image, setImage] =
-// useState(null);     const [signature, setSignature] = useState(null); const
-// handleImageChange = (e) => {         const file = e.target.files[0];      if
-// (file) {             const reader = new FileReader(); reader.onloadend = ()
-// => setImage(reader.result); reader.readAsDataURL(file);         }     };
-// return (         <div>       <h2>Generate PDF with Dynamic Input</h2> <input
-// placeholder="Enter your name" onChange={(e) => setName(e.target.value)} />
-// <div>                 <p>Upload Image:</p>                 <input type="file"
-// accept="image/*" onChange={handleImageChange} /> </div>   <div> <p>Draw
-// Signature:</p>   <SignaturePad setSignature={setSignature} /> </div>
-// <PDFDownloadLink                 document={<MyDocument name={name}
-// image={image} signature={signature} />} fileName="user-input-pdf.pdf"     >
-// {({ loading }) => (loading ? 'Generating...' : 'Download PDF')}
-// </PDFDownloadLink>        </div>     ); } App.tsx
-'use client';
 'use client';
 
 import React, { useRef, useState } from 'react';
@@ -141,6 +123,7 @@ const Page = () => {
             return;
 
         // Dynamically import html2pdf only on the client
+        //@ts-ignore
         const html2pdf = (await import('html2pdf.js')).default;
         const opt = {
             margin: 0,
@@ -631,6 +614,8 @@ const Page = () => {
                     ))}
                     {image && (
                         <Rnd position={imagePos} bounds="parent" onDragStop={(e, d) => setImagePos({ x: d.x, y: d.y })} default={{
+                            x: imagePos.x,
+                            y: imagePos.y,
                             width: 150,
                             height: 150
                         }} // NEW: default dimension for image
@@ -687,6 +672,8 @@ const Page = () => {
                                 }
                             }
                             : item))} default={{
+                                x: sig.pos.x,
+                                y: sig.pos.y,
                                 width: 200,
                                 height: 100
                             }} // NEW: default dimension for signature
