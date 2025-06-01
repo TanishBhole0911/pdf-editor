@@ -19,7 +19,7 @@ const Page = () => {
     useEffect(() => {
         const workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
         console.log('Setting pdfjs workerSrc:', workerSrc);
-        pdfjs.GlobalWorkerOptions.workerSrc = "/_next/static/media/pdf.worker.min.86fe59e9.mjs";
+        pdfjs.GlobalWorkerOptions.workerSrc = "/public/pdf.worker.min.86fe59e9.mjs";
     }, []);
 
     const pdfRef = useRef<HTMLDivElement | null>(null);
