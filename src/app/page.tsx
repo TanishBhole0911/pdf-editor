@@ -5,8 +5,15 @@ import SignatureCanvas from 'react-signature-canvas';
 import { Rnd } from 'react-rnd';
 import { Document as PDFDocument, Page as PDFPage, pdfjs } from 'react-pdf';
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url,).toString();
-
+if (typeof window !== 'undefined') {
+    if (process.env.NEXT_PUBLIC_VERCEL === 'true') {
+        // When deployed on Vercel, use the worker copied to public folder
+        pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
+    } else {
+        // Local builds, use the default worker module reference
+        pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
+    }
+}
 interface TextBox {
     id: number;
     text: string;
