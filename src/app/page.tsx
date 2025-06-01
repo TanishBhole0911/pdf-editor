@@ -17,7 +17,9 @@ const A4_HEIGHT = 842;
 
 const Page = () => {
     useEffect(() => {
-        pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
+        const workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
+        console.log('Setting pdfjs workerSrc:', workerSrc);
+        pdfjs.GlobalWorkerOptions.workerSrc = "/_next/static/media/pdf.worker.min.86fe59e9.mjs";
     }, []);
 
     const pdfRef = useRef<HTMLDivElement | null>(null);
