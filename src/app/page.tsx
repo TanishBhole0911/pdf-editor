@@ -86,14 +86,23 @@ const Page = () => {
         setTextInput('');
     };
 
+    // Change image and imagePos to arrays for multiple images
+    const [images, setImages] = useState<{ id: number; src: string; pos: { x: number; y: number } }[]>([]);
+
+    // Update image upload handler for multiple images
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files
-            ?.[0];
-        if (!file)
-            return;
+        const file = e.target.files?.[0];
+        if (!file) return;
         const reader = new FileReader();
         reader.onloadend = () => {
-            setImage(reader.result as string);
+            setImages(prev => [
+                ...prev,
+                {
+                    id: Date.now(),
+                    src: reader.result as string,
+                    pos: { x: 50, y: 150 }
+                }
+            ]);
         };
         reader.readAsDataURL(file);
     };
@@ -126,8 +135,7 @@ const Page = () => {
         if (!pdfRef.current)
             return;
 
-        // Dynamically import html2pdf only on the client
-        //@ts-ignore
+        // Dynamically import html2pdf only on the client @ts-ignore
         const html2pdf = (await import('html2pdf.js')).default;
         const opt = {
             margin: 0,
@@ -163,8 +171,17 @@ const Page = () => {
         setSignatures(prev => prev.filter(sig => sig.id !== id));
     };
 
-    const deleteImage = () => {
-        setImage(null);
+    // Delete image by id
+    const deleteImage = (id: number) => {
+        setImages(prev => prev.filter(img => img.id !== id));
+    };
+
+    const deleteImageAll = () => {
+        setImages([]);
+    };
+
+    const deletePdfBackground = () => {
+        setPdfBackground(null);
     };
 
     return (
@@ -616,13 +633,19 @@ const Page = () => {
                             </div>
                         </Rnd>
                     ))}
-                    {image && (
-                        <Rnd position={imagePos} bounds="parent" onDragStop={(e, d) => setImagePos({ x: d.x, y: d.y })} default={{
-                            x: imagePos.x,
-                            y: imagePos.y,
-                            width: 150,
-                            height: 150
-                        }} // NEW: default dimension for image
+                    {/* Render all images */}
+                    {images.map((img) => (
+                        <Rnd
+                            key={img.id}
+                            position={img.pos}
+                            bounds="parent"
+                            onDrag={(e, d) => setImages(prev => prev.map(item => item.id === img.id ? { ...item, pos: { x: d.x, y: d.y } } : item))}
+                            default={{
+                                x: img.pos.x,
+                                y: img.pos.y,
+                                width: 150,
+                                height: 150
+                            }}
                             enableResizing={{
                                 top: true,
                                 right: true,
@@ -632,23 +655,27 @@ const Page = () => {
                                 bottomRight: true,
                                 bottomLeft: true,
                                 topLeft: true
-                            }}>
+                            }}
+                        >
                             <div
                                 style={{
                                     position: 'relative',
                                     display: 'inline-block',
                                     width: '100%',
                                     height: '100%'
-                                }}>
+                                }}
+                            >
                                 <img
-                                    src={image}
+                                    src={img.src}
                                     alt="Uploaded"
                                     style={{
                                         width: '100%',
                                         height: '100%'
-                                    }} /> {/* Delete button for image */}
+                                    }}
+                                />
+                                {/* Delete button for image */}
                                 <button
-                                    onClick={deleteImage}
+                                    onClick={() => deleteImage(img.id)}
                                     style={{
                                         position: 'absolute',
                                         top: 0,
@@ -660,12 +687,13 @@ const Page = () => {
                                         width: 20,
                                         height: 20,
                                         cursor: 'pointer'
-                                    }}>
+                                    }}
+                                >
                                     &times;
                                 </button>
                             </div>
                         </Rnd>
-                    )}
+                    ))}
                     {signatures.map((sig) => (
                         <Rnd key={sig.id} position={sig.pos} bounds="parent" onDrag={(e, d) => setSignatures((prev) => prev.map((item) => item.id === sig.id
                             ? {
